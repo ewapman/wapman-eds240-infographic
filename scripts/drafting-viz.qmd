@@ -1,0 +1,499 @@
+---
+title: "Final Project Milestone 3: Drafting Vizualizations"
+author: "Emily Wapman"
+format: pdf
+editor: visual
+execute:
+  warning: false
+  message: false
+---
+
+## Load Libraries
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(here)
+library(readr)
+library(sf)
+library(ozmaps)
+library(dplyr)
+library(janitor)
+library(showtext)
+
+```
+
+## Get Data
+
+```{r}
+# Get the Data
+
+tuesdata <- tidytuesdayR::tt_load('2023-03-07')
+tuesdata <- tidytuesdayR::tt_load(2023, week = 10)
+
+numbats <- tuesdata$numbats
+
+# Or read in the data manually
+
+numbats <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2023/2023-03-07/numbats.csv')
+
+# Write csv
+write_csv(x = numbats, file = here("data", "numbats.csv"))
+
+
+
+
+```
+
+
+## Pre-planning
+**1. Restate the questions you hope to answer with your inforgraphic. This should include one overarching question (think of this as driving the overall theme of your infographic) and at least three subquestions (each of which will be addressed by your infographic’s component visualizations). Have these questions changed at all since FPM #1? If yes, how so?**
+
+I ended up changing my dataset from the first final project milestone, so have a new set of questions. I am now using a dataset I found on the TidyTuesday website locating numbats in Australia. I am going to answer the overall question: Where can one find numbat's in Australia? Three questions I will use to answer this are: Where are hotspots geographically? What time of day are sightings most common? In what weather are sightings most common?
+
+**2. Explain which variables from your data set(s) you will use to answer the above questions, and how.**
+
+I will use the latitude and longitude coordinates to plot locations as well as the hour variable for time of day, the prcp variable for precipitation, and possibly the tmin and tmax variables for the temperature. 
+
+## Vizualization inspiration 
+
+I plan to use the alien image to inspire a similar graph showing the top days and times to see numbats. I might do something similar to the flower image in my precipitation graph, integrating images of suns and rain drops into my lollipop chart. 
+```{r, echo = FALSE}
+knitr::include_graphics(here::here("images", "alien.png"))
+knitr::include_graphics(here::here("images", "flowers.png"))
+
+```
+
+
+## Data Exploration
+```{r}
+
+#Plot on a map
+points_sf <- st_as_sf(numbats, coords = c("decimalLongitude", "decimalLatitude"), 
+                      crs = 4326, na.fail = FALSE)
+
+map_numbats <-  ggplot() +
+  geom_sf(data = ozmap_states) +        # Plot Australia map
+  geom_sf(data = points_sf, color = "red", size = 1) + # Plot your points
+  theme_void()
+
+# Boxplot of time of day sighted
+
+numbats_hourly_counts <- numbats |>
+  group_by(eventDate, hour) |>   
+  summarize(n_sightings = n())
+
+box_time <- ggplot(numbats_hourly_counts, aes(x = hour, y = n_sightings)) +
+  geom_col()
+
+# Boxplot of weather for sighting
+numbats_weather <- numbats |> 
+  clean_names() |> 
+  select(event_date, prcp) |> 
+  drop_na() 
+
+numbats_weather_plot <- ggplot(numbats_weather, aes(x = prcp)) +
+  geom_bar()
+
+# Temperature plot - dumbell chart? 
+numbats_temperature <- numbats |> 
+  clean_names() |> 
+  select(event_date, ) |> 
+  drop_na() 
+
+```
+
+## Visualization Inspiration 
+```{r}
+# map - AUS map, maybe with annotated nearest cities, or circular part around 
+# it with cities, or simple outline map w/nearest city annotations
+# rain - bar graph or lollipop chart using sun/umbrella
+# time/day of week? - similar to Dan Ohems circular chart
+# temp? - lollipop
+
+
+
+```
+
+## Hand-drawn visualization
+```{r, out.width='60%', echo = FALSE}
+knitr::include_graphics(here::here("images", "drawing.jpg"))
+
+
+```
+
+## Make Visualizations
+
+Color Palette 
+```{r}
+brown1 = "#f0d4af" 
+brown2 = "#d9a066" 
+brown3 = "#b8743c"
+# brown1 = "#b6ad90" 
+# brown2 = "#a68a64"
+# brown3 = "#936639"
+brown4 = "#7f4f24"
+brown5 = "#582f0e"
+green1 = "#c2c5aa"
+green2 = "#a4ac86"
+green3 = "#656d4a"
+green4 = "#414833"
+green5 = "#333d29"
+
+
+
+```
+
+Map
+```{r}
+#Plot on a map
+
+# Get map features/join to state dataset
+points_sf <- st_as_sf(numbats, coords = c("decimalLongitude", "decimalLatitude"), 
+                      crs = 4326, na.fail = FALSE)
+points_sf <- st_transform(points_sf, st_crs(ozmap_states))
+#points_with_states <- st_join(points_sf, ozmap_states)
+
+# Get number of observatins per state
+#state_counts <- points_with_states |> 
+  #st_drop_geometry() |> 
+  #group_by(NAME, day) |> 
+  #summarise(n_obs = n()) |> 
+  #drop_na()
+
+#ozmap_shaded <- ozmap_states |> 
+  #left_join(state_counts, by = "NAME")
+
+map_numbats <-  ggplot() +
+  geom_sf(data = ozmap_states, fill = brown1, color = "grey60", linewidth = 0.5, linetype = 2) + 
+  geom_sf(data = ozmap_country, fill = NA, color = "black", linewidth = 0.4) +        
+  geom_sf(data = points_sf, color = green5, size = 1, alpha = 0.7) + 
+  scale_fill_viridis_c(option = "plasma") +
+  labs(title = "Numbat Sightings",
+       subtitle = "Southwestern Australia has the greatest number of numbat 
+       sightings.") +
+  theme_void() +
+  theme(
+     plot.title = element_text(family = "sarala", face = "bold", size = 14),
+    plot.subtitle = element_text(family = "sarala", size = 10)
+  )
+
+
+
+showtext_auto(enable = TRUE)
+
+map_numbats
+
+
+showtext_auto(enable = FALSE)
+```
+
+Time of Day
+```{r}
+# Clean dataset for this graph - need col for day of the week, hour, 
+# total number of observations that day, 
+# opacity value
+
+# Add fonts
+library(showtext)
+font_add_google(name = "Sarala", family = "sarala")
+font_add_google(name = "Noto Sans", family = "noto-sans")
+font_add_google(name = "IBM Plex Mono", "plexmono")
+
+# Add column for total observations per day and opacity value
+numbats_time <- numbats |> 
+  group_by(hour,wday) |> 
+  summarise(total_daily_obs = n(), .groups = "drop") |> 
+  drop_na() |> 
+  mutate(opacity_val = (total_daily_obs / max(total_daily_obs)))
+
+# Make it so all hours show up
+
+# Build plot
+
+numbats_time$wday <- factor(
+  numbats_time$wday,
+  levels = c("Mon","Tue","Wed","Thu","Fri","Sat","Sun")
+)
+
+numbats_time$wday_num <- as.numeric(numbats_time$wday)
+
+days_df <- numbats_time |>
+  distinct(wday_num, wday)
+
+
+
+# Make a column for hours in 12 hour time
+#numbats_time <- numbats_time |> 
+  #mutate(hour_lab = case_when(
+          #hour == 0 ~ "12am",
+          #hour <= 12 ~ paste0(hour, "am"),
+          #hour == 12 ~ "12pm",
+          #TRUE ~ paste0(hour - 12, "pm"))
+        #)
+
+hour_df <- data.frame(
+  hour = 0:23,
+  label = tolower(format(strptime(0:23, "%H"), "%I%p"))
+) 
+hour_df$label <- sub("^0", '', hour_df$label)
+
+
+
+
+plot_day <- ggplot(data = numbats_time) +
+  geom_tile(aes(x = hour, 
+                y = wday_num,
+                fill = total_daily_obs),
+            #fill = as.numeric(numbats_time$total_daily_obs),
+            height = 1,
+            width = 1) +
+  scale_fill_gradientn(
+  colours = c(brown1, brown2, brown3, brown4, brown5),
+  trans = "log"
+) +
+  geom_text(data = hour_df, aes(x = hour, y = 9, label = label),
+            size = 2, color = "gray30", family = "plexmono") +
+  geom_text(data = days_df, aes(x = 0, y = wday_num, label = str_sub(string = wday, start = 1, 
+                                                     end = 1)),
+            size = 1.5, color = "gray30", family = "plexmono") +
+  coord_polar() +
+  theme_void() +
+  scale_y_continuous(limits = c(0, 9), expand = c(0, 0)) + 
+  scale_x_continuous(limits = c(-0.5, 23.5), expand = c(0, 0)) + 
+  ylim(-4, 9) +
+  labs(title = "Best Day and Time for Numbats",
+       subtitle = "One pm any day of the week is prime numbat time") +
+  theme(
+    legend.position = "none",
+    plot.title = element_text(family = "sarala", face = "bold", size = 14),
+    plot.subtitle = element_text(family = "sarala", size = 10)
+  ) 
+showtext_auto(enable = TRUE)
+
+plot_day
+
+showtext_auto(enable = FALSE)
+
+# Rjoin stitching - same number of columns 0 and day of week and NA's for others
+
+```
+
+Rain
+```{r}
+
+# Make a lollipop chart for amount of precipitation by number of observations
+
+numbats_prcp <- numbats |> 
+  drop_na(prcp) |> 
+  group_by(day) |> 
+  summarize(
+    total_obs = n(),       
+    prcp = first(prcp),    
+    .groups = "drop"
+  )
+
+# Create bins
+numbats_prcp_bins <- numbats_prcp %>%
+  mutate(prcp_bin = cut(
+    prcp,                  # the variable to bin
+    breaks = seq(0, max(prcp) + 1, by = 1),  # from 0 to max +1 in steps of 1
+    include.lowest = TRUE,
+    labels = paste0(seq(0, ceiling(max(prcp))-1, by = 1), "-", 
+                      seq(1, ceiling(max(prcp)), by = 1)) 
+  )) |> 
+  group_by(prcp_bin) |> 
+  summarize(total_obs = sum(total_obs), .groups = "drop")
+
+
+# Make plot
+numbats_weather_plot <- ggplot(numbats_prcp_bins, aes(x = prcp_bin, 
+                                                      y = total_obs)) +
+  geom_segment(aes(x = prcp_bin, xend = prcp_bin, y = 0, yend = total_obs),
+               color = "black", size = 0.5) +  
+  geom_point(color = "blue", size = 3)  + 
+  scale_y_reverse() +  
+  labs(title = "Affect of Precipitation on Numbat Sightings",
+       subtitle = "The greatest number of sightings occured on sunny days",
+       x = "Precipitation (mm)",
+       y = "Total Numbat Sightings") +
+  theme(
+  axis.text.x.top = element_text(angle = 45, hjust = 0),  # x-axis labels on top
+  axis.title.x.top = element_text(),                      # x-axis title on top
+  axis.ticks.x.top = element_line(),                      # x-axis ticks on top
+  axis.text.x = element_blank(),                          # remove labels from bottom
+  axis.title.x = element_blank(),                         # remove bottom title
+  axis.ticks.x = element_blank()                          # remove bottom ticks
+) +
+  scale_x_discrete(position = "top") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(family = "sarala", face = "bold", size = 14),
+    plot.subtitle = element_text(family = "sarala", size = 10),
+    axis.title.x = element_text(family = "noto-sans", size = 9),
+    axis.title.y = element_text(family = "noto-sans", size = 9, 
+                                margin = margin(r = 12)),
+     axis.text.x = element_text(family = "noto-sans", size = 8),
+  axis.text.y = element_text(family = "noto-sans", size = 8),
+  axis.title.x.top = element_text(
+    margin = margin(b = 12)),
+  panel.grid = element_blank(),        
+  axis.line = element_line(color = "darkgrey", linewidth = 0.5)
+  
+  )
+  
+  
+
+
+
+
+showtext_auto(enable = TRUE)
+numbats_weather_plot
+showtext_auto(enable = FALSE)
+
+
+```
+
+Biodiversity plot - numbers over time
+```{r}
+# Wrangle data: year & number of observations per year 
+numbats_year <- numbats |> 
+  group_by(year) |> 
+  summarize(total_per_year = n()) |> 
+  drop_na()
+
+# Add icons: 
+# Example: numbats_year has columns year and total_per_year
+# Add a stacking position for each icon
+#numbats_expanded <- numbats_expanded %>%
+  #group_by(year) %>%
+  #mutate(y_pos = row_number()) %>%
+  #ungroup()
+
+max_icons <- 5
+numbats_year$icons <- round(numbats_year$total_per_year / max(numbats_year$total_per_year) * max_icons)
+
+#numbats_icons <- numbats_year %>%
+ # uncount(icons) %>%             # one row per icon
+ # group_by(year) %>%
+ # mutate(y_pos = row_number()/n) %>%  # spread vertically, scaled to fit stripe
+ # ungroup()
+# numbats_icons <- numbats_year %>%
+#   uncount(icons) %>%
+#   mutate(
+#     # jitter x slightly for organic look
+#     x_jitter = as.numeric(factor(year)) + runif(n(), -0.3, 0.3),
+#     # jitter y slightly above the stripe
+#     y_jitter = 1 + runif(n(), 0, 0.3),
+#     img = "numbat_icon.png"
+#   )
+# numbats_icons$img <- here("icons", "numbat_icon.svg")
+
+# library(ggimage)
+# library(rsvg)
+
+biodiversity_plot <- ggplot(numbats_year, aes(x=factor(year), y=1, fill=total_per_year)) +
+  geom_tile() +
+  scale_fill_gradientn(colors = c(green1, brown3,brown4)) +
+  theme_minimal() +
+  theme(
+    axis.title = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks = element_blank(),
+    panel.grid = element_blank()
+   ) +
+  theme_void() +
+  theme(legend.position = "none")
+  # geom_image(data=numbats_icons, aes(x=x_jitter, y= y_jitter, image=img), size=0.05,
+  #            inherit.aes = FALSE)
+biodiversity_plot
+
+
+
+```
+
+
+
+
+Month of the Year -- Waffle Chart or Line graph 
+```{r}
+# Clean data - get number of sightings per month 
+
+numbats_month <- numbats |> 
+  select(month, day) |> 
+  drop_na() |> 
+  group_by(month) |> 
+  summarize(total_obs_month = n()) |> 
+  ungroup() 
+
+# Make waffle chart 
+
+# ggplot(numbats_month, aes(fill = month, values = total_obs_month)) +
+#   geom_waffle(color = "white", size = 0.5, n_rows = 10, flip = FALSE) +
+#   coord_equal() +
+#   expand_limits(x = c(0, 0), y = c(0, 0)) +
+#   scale_x_continuous(expand = c(0, 0)) +
+#   scale_y_continuous(expand = c(0, 0)) +
+#   theme_void() +
+#   theme(legend.position = "bottom") +
+#   labs(title = "Monthly Numbat Sightings (Combined)")
+
+
+numbats_month <- numbats_month |> 
+   mutate(month = factor(month, levels = month.abb))
+# ggplot(numbats_month, aes(x = month, y = total_obs_month)) +
+#   geom_col() +
+#   theme_minimal() +
+#   labs(
+#     title = "Monthly Numbat Sightings",
+#     x = "Month",
+#     y = "Total Observations"
+#   ) +
+#   theme(legend.position = "none") # Hides legend since months are on the x-axis
+
+
+numbats_month_line <- ggplot(numbats_month, aes(x = month, 
+                                                y = total_obs_month, group = 1)) +
+  geom_line(color = "black", size = 0.5) +
+  geom_point(color = "black", size = 0) + 
+  theme_minimal() +
+  labs(
+    title = "Numbat Sightings Per Month",
+    subtitle = "November had the greatest number of sightings",
+    x = "Month",
+    y = "Total Observations"
+  ) +
+  theme(
+  plot.title = element_text(family = "sarala", face = "bold", size = 14),
+  plot.subtitle = element_text(family = "sarala", size = 10),
+  axis.title.x = element_text(family = "noto-sans", size = 9, 
+                              margin = margin(t = 12)),
+  axis.title.y = element_text(family = "noto-sans", size = 9, 
+                              margin = margin(r = 12)),
+  axis.text.x = element_text(family = "noto-sans", size = 9),
+  axis.text.y = element_text(family = "noto-sans", size = 9),
+  panel.grid = element_blank()
+  )
+
+showtext_auto(enable = TRUE)
+numbats_month_line
+showtext_auto(enable = FALSE)
+
+```
+
+
+## Final Questions
+**1. What are the key insights you want your infographic to communicate, and how will your design choices help highlight and support those messages?**
+
+I am trying to show the best place and time to see numbats in Australia. I am planning to provide more context into what numbats are and show the best time of day/days of week, month of the year, location in Australia, and weather conditions. 
+
+**2. What challenges did you encounter or anticipate encountering as you continue to build / iterate on your visualizations in R? If you struggled with mocking up any of your three visualizations, describe those challenges here.**
+
+I am struggling to make these look more aesthetic. I am particularly struggling with how to make the precipitation graph look better. I fell like all my visualizations are pretty simple so am not sure how to make them more creative.  
+
+**3. What ggplot extension tools / packages do you need to use to build your visualizations? Are there any that we haven’t covered in class that you’ll be learning how to use for your visualizations?**
+
+I haven't used any ggplot extension tools. 
+
+**4. What feedback do you need from the instructional team and / or your peers to ensure that your intended message and key insights are clear?**
+
+I would love feedback on how to make these more aesthetic or creative. I am also open to exploring alternative graph options.

@@ -1,0 +1,123 @@
+---
+title: "Exploratory Data Analysis"
+author: "Emily Wapman"
+date: "February 2, 2026"
+format: pdf
+editor: visual
+execute: 
+  warning: false
+  message: false
+---
+
+## Read in data and load libraries
+
+```{r}
+library(here)
+library(tidyverse)
+library(ggplot2)
+library(janitor)
+library(dplyr)
+
+amphibians <- read_csv(here("data", "amphibian.csv"))
+
+fish <- read_csv(here("data", "fish.csv"))
+
+shrimp <- read_csv(here("data", "shrimp.csv"))
+
+zoops <- read_csv(here("data", "zoops.csv"))
+
+unique(fish$fish_species)
+```
+
+## Clean data
+```{r}
+# Amphibians - clean
+# Fish - clean
+# shrimp - clean
+
+# Zoops -- needs cleaning
+zoops_clean <-  zoops |> 
+  clean_names()
+
+# Join fish and amphibian data sets
+
+fish_amph_join <- full_join(amphibians, fish, by = "lake_id")
+
+# Calculate total amphibian adults by fish species
+fish_amph_grouped <- fish_amph_join |> 
+  filter(amphibian_life_stage == "Adult") |> 
+  group_by(lake_id, fish_species) |> 
+  summarize(total_amphibians = sum(amphibian_number, na.rm = TRUE)) |> 
+  ungroup()
+
+# Summarize amphibians by lake and year for time series data
+amph_ts <- fish_amph_join |> 
+  filter(amphibian_life_stage == "Adult") |> 
+  group_by(lake_id, survey_date.x) |> 
+  summarize(total_amphibians = sum(amphibian_number, na.rm = TRUE)) |> 
+  ungroup()
+
+```
+
+## Exploratory Data Analysis
+
+
+```{r}
+# Bar graph of species of fish by number of amphibians
+
+ggplot(fish_amph_grouped, aes(x = fish_species, y = total_amphibians + 1)) +
+  geom_boxplot() +
+  scale_y_log10() +
+  geom_jitter(width = 0.2, alpha = 0.6)
+
+```
+## Time series - Amphibians
+
+```{r}
+
+amph_ts <-  amph_ts |> 
+  mutate(survey_date.x = as.Date(survey_date.x, format = "%m/%d/%Y"))
+
+ggplot(amph_ts, aes(x = survey_date.x, y = total_amphibians)) +
+  geom_line()
+
+```
+
+## Scatter plot - total non native fish by adult amphibians 
+```{r}
+
+# Find total number of fish per lake 
+total_fish_lake <-fish |> 
+  group_by(lake_id) |> 
+  summarize(total_fish = n())
+
+# Find total number of adult amphibians per lake
+total_amph_lake <-amphibians |> 
+  group_by(lake_id) |> 
+  summarize(total_amphibian = sum(amphibian_number))
+
+# join the two
+fish_amph_lake_totals <- full_join(total_fish_lake, total_amph_lake, by = "lake_id")
+
+ggplot(fish_amph_lake_totals, aes(x = total_fish, y = total_amphibian)) +
+  scale_y_log10() +
+  geom_point()
+
+
+
+
+```
+## Questions:
+**1. What have you learned about your data? Have any potentially interesting patterns emerged? Point to specific visualizations that you created as you describe your findings.**
+
+My data unfortunately does not seem to have any interesting patterns. The scatter plot (figure 3) indicates no trend and the time series data of adult amphibian counts just shows peaks at the survey years with no indication of true population levels over time since the survey was not consistent. The boxplot also does not show any specific trends. 
+
+**2. In FPM #1, you outlined some questions that you wanted to answer using these data. Have you made any strides towards answering those questions? If yes, how so? If no, what next steps do you need to take (e.g. I need to create X plot type, I still need to track down Y data, I need to restructure existing data so that you can visualize it in Z ways, etc.)? Have any new questions emerged?**
+
+I tried to answer my question relating non native fish populations and amphibian populations by creating graphs relating total numbers of each per lake and then looking at if any particular non native species had an impact (bar graph). For next steps, I think I need to look into finding an alternative data set. 
+
+**3. What challenges do you foresee encountering with your data? These can be data wrangling and / or visualization challenges.**
+
+So far, my data haven't shown any interesting trends. The data sets themselves were clean and easy to work with but don't seem to fit my needs for the final project. 
+
+
