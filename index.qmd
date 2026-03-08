@@ -8,11 +8,11 @@ author: "Emily Wapman"
 
 ## Background
 
-After two months clunking and rattling around Western Australia in an old Landcruiser with my boyfriend, it was clear that the country had some charmingly odd and terrifying wildlife. (However, locals deemed it more necessary to warn us about accidents from hitting cows on the road than the venemous snails and stonefish in the water). It was also clear that many of these incredible native species were under serious threat of disappearing from threats such as introduced predators, fire, habitat fragmentation, and climate change. As an environmental scientist, it was fascinating to learn about the conservation challenges of another country and heartbreaking to hear that these quintessential, Australian wildlife experiences – even the poisonous ones – could so easily disappear. Months after returning home, my boyfriend was still calling everyone mate and eating vegemite, and I was still thinking about wildlife conservation in Australia. 
+After two months clunking and rattling around Western Australia in an old Landcruiser with my boyfriend, it was clear that the country had some charmingly odd and terrifying wildlife. (Locals, however, were more concerned with warning us about hitting cows on the road than about venemous snails or stonefish in the water). It was also obvious that many of these incredible native species were under serious threat from introduced predators, fire, habitat fragmentation, and climate change. As an environmental scientist, it was fascinating to learn about the conservation challenges of another country, and heartbreaking to hear that these quintessential, Australian wildlife experiences – even the poisonous ones – could so easily disappear. Months after returning home, my boyfriend was still calling everyone "mate" and eating vegemite, and I was still thinking about wildlife conservation in Australia. 
 
 ## Data and Goals
 
-My data visualization class provided the perfect opportunity to explore my obsession through data. I found the Numbats in Australia dataset from the [TidyTuesday github repository](https://github.com/rfordatascience/tidytuesday/blob/main/data/2023/2023-03-07/readme.md), which was originally sourced from [The Atlas of Living Australia](https://www.ala.org.au). The dataset has information on numbat sightings all the way from 1856 to the beginning of 2023. Numbats are small marsupials listed as endangered and the Perth Zoo and Western Australia Department of Biodiversity, Conservation and Attractions lead recovery efforts in Western Australia. For my infographic, I wanted to show the best conditions and locations to see a numbat for fellow wildlife enthusiasts while also providing some context on numbat conservation. 
+My data visualization class provided the perfect opportunity to explore my obsession through data. I found the Numbats in Australia dataset from the [TidyTuesday github repository](https://github.com/rfordatascience/tidytuesday/blob/main/data/2023/2023-03-07/readme.md), which was originally sourced from [The Atlas of Living Australia](https://www.ala.org.au). The dataset has information on numbat sightings all the way from 1856 to the beginning of 2023. Numbats are small, endangered marsupials, and the Perth Zoo and Western Australia Department of Biodiversity, Conservation and Attractions lead recovery efforts in Western Australia. For my infographic, I wanted to show the best conditions and locations to see a numbat for fellow wildlife enthusiasts while also providing some context on numbat conservation. 
 
 ## My Infographic
 ```{r, out.width='100%', echo = FALSE}
@@ -23,35 +23,35 @@ knitr::include_graphics(here::here("images", "Infographic_numbats.png"))
 
 # Graphic form
 
-I primarily used alternative chart times to make my visualization more artistic while still conveying the key results from the analysis. 
+I primarily used alternative chart types to make my visualization more artistic while still conveying the key results from the analysis. 
 
-**Waffle Chart** - I chose this format instead of my original plan, a line graph, because I thought it visually created an interesting balance with the bottom biodiversity chart. I also thought it was interesting to see the differences in observation numbers. 
+**Waffle Chart** - I chose this format instead of my original plan, a line graph, because I thought it created an interesting balance with the bottom biodiversity chart. I also thought it was a good way to show the differences in observation numbers. 
 
 **Circular Chart** - I was inspired by [Dan Oehm's work](https://github.com/doehm/tidytues) in the UFO TidyTuesday dataset. I thought this was a great format to show both the best time of day and day of the week for numbat sightings.    
 
-**Map** - I chose a map of Australia because I wanted to visualize the overall distribution of numbats. I added the territory lines because I thought it would be in interesting additional detail.
+**Map** - I chose a map of Australia because I wanted to visualize the overall distribution of numbats. 
 
 **Biodiversity Chart** - I chose a biodiversity chart because I thought it would be an interesting artistic addition. I also thought the stripes represented the pattern of a numbat. 
 
 # Text & typography 
 
-I chose 3 fonts for my infographic. I wanted the theme of my infographic to be fun. For my header, I chose Luckiest Guy from Google Fonts because it is bold and looked adventurous. For my annotations, I chose Caveat from Google Fonts because I wanted a font that looked like handwriting to make the visualization look more natural and organic. I chose Courier Prime for the numbers on my cirle graph because I wanted a monospaced font. 
+I chose three fonts for my infographic. I wanted the theme of my infographic to be fun because everyone smiles when they see a photo of a numbat! For my header, I chose Luckiest Guy from Google Fonts because it is bold and looked adventurous. For my annotations, I chose Caveat from Google Fonts because I wanted a font that looked like handwriting to make the visualization look more natural and organic. I chose Courier Prime for the numbers on my circle graph because I wanted a monospaced font. 
 
 # Theme and Layout 
 
-I decided to make the waffle chart in biodiversity chart borders at the top and bottom to balance each other out visually and then put the 2 others parts in the middle. I thought it would look less balanced and too cluttered if I put both of the long graphs next to each other at the top or bottom. I used annotations instead of chart titles to reduce clutter. 
+I decided to make the waffle chart and biodiversity chart borders at the top and bottom to create visual balance. I thought it would look too cluttered if I put both of the long graphs next to each other at the top or bottom. I used annotations instead of chart titles to reduce clutter. 
 
 # Color 
 
-I chose a palette of Browns and greens because I thought it reflected the natural colors in Australia. Greens reminded me eucalyptus and browns reminded me of the Outback. I wanted the overall infographic to have a natural appearance. 
+I chose a palette of Browns and greens because I thought it reflected the natural colors in Australia. Greens reminded me of eucalyptus and browns reminded me of the Outback. I wanted the overall infographic to have a natural appearance. 
 
 # Contextualizing the data
 
-Contextualize the data I added annotations to highlight key takeaways and added an icon to show what a numbat looks like.
+To contextualize the data, I added annotations to highlight key takeaways and added an icon to show what a numbat looks like.
 
 # Centering my primary message
 
-To emphasize my main takeaways, I used annotations. On each graph, I noted what the best place, month, or time of day is to see numbats and gave some background and explanation to help interpret the results.
+To emphasize my main takeaways, I used annotations. On each graph, I noted what the best place, month, or time of day is to see numbats and gave some background and explanations to help interpret the results.
 
 # Considering accessibility
 
