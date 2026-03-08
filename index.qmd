@@ -305,4 +305,5 @@ ggsave(here("images", "month_waffle.pdf"), plot = waffle, width = 7, height = 3,
 
 Numbat (Myrmecobius fasciatus) Recovery Plan. (n.d.).
 
+Tidy Tuesday-Numbats in Australia: https://github.com/rfordatascience/tidytuesday/blob/main/data/2023/2023-03-07/readme.md
 
