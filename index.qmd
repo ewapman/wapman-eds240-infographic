@@ -15,7 +15,7 @@ After two months clunking and rattling around Western Australia in an old Landcr
 My data visualization class provided the perfect opportunity to explore my obsession through data. I found the Numbats in Australia dataset from the [TidyTuesday github repository](https://github.com/rfordatascience/tidytuesday/blob/main/data/2023/2023-03-07/readme.md), which was originally sourced from [The Atlas of Living Australia](https://www.ala.org.au). The dataset has information on numbat sightings all the way from 1856 to the beginning of 2023. Numbats are small marsupials listed as endangered and the Perth Zoo and Western Australia Department of Biodiversity, Conservation and Attractions lead recovery efforts in Western Australia. For my infographic, I wanted to show the best conditions and locations to see a numbat for fellow wildlife enthusiasts while also providing some context on numbat conservation. 
 
 ## My Infographic
-```{r, out.width='90%', echo = FALSE}
+```{r, out.width='100%', echo = FALSE}
 knitr::include_graphics(here::here("images", "Infographic_numbats.png"))
 ```
 
