@@ -147,6 +147,10 @@ Map
 ```{r}
 #Plot on a map
 
+showtext_auto(enable = TRUE)
+
+#pdf(here("images", "map2.pdf"), width = 8, height = 6)
+
 # Get map features/join to state dataset
 points_sf <- st_as_sf(numbats, coords = c("decimalLongitude", "decimalLatitude"), 
                       crs = 4326, na.fail = FALSE)
@@ -177,11 +181,14 @@ map_numbats <-  ggplot() +
     plot.subtitle = element_text(family = "sarala", size = 10)
   )
 
+#ggsave(here("images", "map.svg"), plot = map_numbats, width = 6, height = 6, dpi = 600, bg = green1)
+
+#print(map_numbats)
 
 
-showtext_auto(enable = TRUE)
+#dev.off()
+pdf(here("map2.pdf"), width = 8, height = 6); print(map_numbats); dev.off()
 
-map_numbats
 
 
 showtext_auto(enable = FALSE)
@@ -198,6 +205,7 @@ library(showtext)
 font_add_google(name = "Sarala", family = "sarala")
 font_add_google(name = "Noto Sans", family = "noto-sans")
 font_add_google(name = "IBM Plex Mono", "plexmono")
+font_add_google(name = "Courier Prime", family = "courier_p")
 
 # Add column for total observations per day and opacity value
 numbats_time <- numbats |> 
@@ -252,10 +260,10 @@ plot_day <- ggplot(data = numbats_time) +
   trans = "log"
 ) +
   geom_text(data = hour_df, aes(x = hour, y = 9, label = label),
-            size = 2, color = "gray30", family = "plexmono") +
+            size = 4, color = "gray30", family = "courier_p") +
   geom_text(data = days_df, aes(x = 0, y = wday_num, label = str_sub(string = wday, start = 1, 
                                                      end = 1)),
-            size = 1.5, color = "gray30", family = "plexmono") +
+            size = 3, color = "gray30", family = "courier_p") +
   coord_polar() +
   theme_void() +
   scale_y_continuous(limits = c(0, 9), expand = c(0, 0)) + 
@@ -268,7 +276,11 @@ plot_day <- ggplot(data = numbats_time) +
     plot.title = element_text(family = "sarala", face = "bold", size = 14),
     plot.subtitle = element_text(family = "sarala", size = 10)
   ) 
+
+
+
 showtext_auto(enable = TRUE)
+ggsave(here("images", "time_of_day.pdf"), plot = plot_day, width = 6, height = 6, dpi = 600)
 
 plot_day
 
@@ -393,7 +405,7 @@ numbats_year$icons <- round(numbats_year$total_per_year / max(numbats_year$total
 
 biodiversity_plot <- ggplot(numbats_year, aes(x=factor(year), y=1, fill=total_per_year)) +
   geom_tile() +
-  scale_fill_gradientn(colors = c(green1, brown3,brown4)) +
+  scale_fill_gradientn(colors = c(green2, brown3,brown4)) +
   theme_minimal() +
   theme(
     axis.title = element_blank(),
@@ -407,6 +419,7 @@ biodiversity_plot <- ggplot(numbats_year, aes(x=factor(year), y=1, fill=total_pe
   #            inherit.aes = FALSE)
 biodiversity_plot
 
+ggsave(here("images", "biodiversity.pdf"), plot = biodiversity_plot, width = 10, height = 6, dpi = 1000)
 
 
 ```
@@ -426,17 +439,45 @@ numbats_month <- numbats |>
   ungroup() 
 
 # Make waffle chart 
+library(waffle)
 
-# ggplot(numbats_month, aes(fill = month, values = total_obs_month)) +
-#   geom_waffle(color = "white", size = 0.5, n_rows = 10, flip = FALSE) +
-#   coord_equal() +
-#   expand_limits(x = c(0, 0), y = c(0, 0)) +
-#   scale_x_continuous(expand = c(0, 0)) +
-#   scale_y_continuous(expand = c(0, 0)) +
-#   theme_void() +
-#   theme(legend.position = "bottom") +
-#   labs(title = "Monthly Numbat Sightings (Combined)")
+numbats_month_waffle <- numbats |> 
+  select(month, day) |> 
+  drop_na() |> 
+  group_by(month) |> 
+  summarize(total_obs_month = n()) |> 
+  ungroup() |> 
+  mutate(month = factor(month, 
+                        levels = c("Jan","Feb","Mar","Apr","May","Jun",
+               "Jul","Aug","Sep","Oct","Nov","Dec"))) |> 
+  arrange(month)
 
+waffle <-  ggplot(numbats_month_waffle, aes(fill = month, values = total_obs_month)) +
+  geom_waffle(color = "white", size = 0.5, n_rows = 10, flip = FALSE) +
+  coord_equal() +
+  expand_limits(x = c(0, 0), y = c(0, 0)) +
+  scale_x_continuous(expand = c(0, 0)) +
+  scale_y_continuous(expand = c(0, 0)) +
+  theme_void() +
+  theme(legend.position = "bottom") +
+  labs(title = "Monthly Numbat Sightings (Combined)") +
+  scale_fill_manual(values = c(
+    Jan = green2,
+  Feb = green2,
+  Mar = green2,
+  Apr = green2,
+  May = green2,
+  Jun = green2,
+  Jul = green2,
+  Aug = green2,
+  Sep = green2,
+  Oct = green2,
+  Nov = brown4,   # highlight month
+  Dec = brown3
+  ))
+waffle
+
+ggsave(here("images", "month_waffle.pdf"), plot = waffle, width = 7, height = 3, units = "in", dpi = 600, bg = green1)
 
 numbats_month <- numbats_month |> 
    mutate(month = factor(month, levels = month.abb))
@@ -453,8 +494,9 @@ numbats_month <- numbats_month |>
 
 numbats_month_line <- ggplot(numbats_month, aes(x = month, 
                                                 y = total_obs_month, group = 1)) +
-  geom_line(color = "black", size = 0.5) +
-  geom_point(color = "black", size = 0) + 
+  geom_line(color = brown2, size = 0.5) +
+  geom_point(color = brown2, size = 0) + 
+  geom_area(fill = brown2) +
   theme_minimal() +
   labs(
     title = "Numbat Sightings Per Month",
@@ -465,14 +507,16 @@ numbats_month_line <- ggplot(numbats_month, aes(x = month,
   theme(
   plot.title = element_text(family = "sarala", face = "bold", size = 14),
   plot.subtitle = element_text(family = "sarala", size = 10),
-  axis.title.x = element_text(family = "noto-sans", size = 9, 
+  axis.title.x = element_text(family = "noto-sans", size = 14, 
                               margin = margin(t = 12)),
-  axis.title.y = element_text(family = "noto-sans", size = 9, 
+  axis.title.y = element_text(family = "noto-sans", size = 14, 
                               margin = margin(r = 12)),
-  axis.text.x = element_text(family = "noto-sans", size = 9),
-  axis.text.y = element_text(family = "noto-sans", size = 9),
+  axis.text.x = element_text(family = "noto-sans", size = 12),
+  axis.text.y = element_text(family = "noto-sans", size = 12),
   panel.grid = element_blank()
   )
+
+ggsave(here("images", "month.pdf"), plot = numbats_month_line, width = 6, height = 4, units = "in", dpi = 600, bg = green1)
 
 showtext_auto(enable = TRUE)
 numbats_month_line
