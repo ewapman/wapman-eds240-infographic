@@ -6,22 +6,22 @@ author: "Emily Wapman"
 
 ---
 
-## Background
+# Background
 
 After two months clunking and rattling around Western Australia in an old Landcruiser with my boyfriend, it was clear that the country had some charmingly odd and terrifying wildlife. (Locals, however, were more concerned with warning us about hitting cows on the road than about venemous snails or stonefish in the water). It was also obvious that many of these incredible native species were under serious threat from introduced predators, fire, habitat fragmentation, and climate change. As an environmental scientist, it was fascinating to learn about the conservation challenges of another country, and heartbreaking to hear that these quintessential, Australian wildlife experiences – even the poisonous ones – could so easily disappear. Months after returning home, my boyfriend was still calling everyone "mate" and eating vegemite, and I was still thinking about wildlife conservation in Australia. 
 
-## Data and Goals
+# Data and Goals
 
 My data visualization class provided the perfect opportunity to explore my obsession through data. I found the Numbats in Australia dataset from the [TidyTuesday github repository](https://github.com/rfordatascience/tidytuesday/blob/main/data/2023/2023-03-07/readme.md), which was originally sourced from [The Atlas of Living Australia](https://www.ala.org.au). The dataset has information on numbat sightings all the way from 1856 to the beginning of 2023. Numbats are small, endangered marsupials, and the Perth Zoo and Western Australia Department of Biodiversity, Conservation and Attractions lead recovery efforts in Western Australia. For my infographic, I wanted to show the best conditions and locations to see a numbat for fellow wildlife enthusiasts while also providing some context on numbat conservation. 
 
-## My Infographic
+# My Infographic
 ```{r, out.width='100%', echo = FALSE}
 knitr::include_graphics(here::here("images", "Infographic_numbats.png"))
 ```
 
-## Approach
+# Approach
 
-# Graphic form
+## Graphic form
 
 I primarily used alternative chart types to make my visualization more artistic while still conveying the key results from the analysis. 
 
@@ -33,31 +33,31 @@ I primarily used alternative chart types to make my visualization more artistic 
 
 **Biodiversity Chart** - I chose a biodiversity chart because I thought it would be an interesting artistic addition. I also thought the stripes represented the pattern of a numbat. 
 
-# Text & typography 
+## Text & typography 
 
 I chose three fonts for my infographic. I wanted the theme of my infographic to be fun because everyone smiles when they see a photo of a numbat! For my header, I chose Luckiest Guy from Google Fonts because it is bold and looked adventurous. For my annotations, I chose Caveat from Google Fonts because I wanted a font that looked like handwriting to make the visualization look more natural and organic. I chose Courier Prime for the numbers on my circle graph because I wanted a monospaced font. 
 
-# Theme and Layout 
+## Theme and Layout 
 
 I decided to make the waffle chart and biodiversity chart borders at the top and bottom to create visual balance. I thought it would look too cluttered if I put both of the long graphs next to each other at the top or bottom. I used annotations instead of chart titles to reduce clutter. 
 
-# Color 
+## Color 
 
 I chose a palette of Browns and greens because I thought it reflected the natural colors in Australia. Greens reminded me of eucalyptus and browns reminded me of the Outback. I wanted the overall infographic to have a natural appearance. 
 
-# Contextualizing the data
+## Contextualizing the data
 
 To contextualize the data, I added annotations to highlight key takeaways and added an icon to show what a numbat looks like.
 
-# Centering my primary message
+## Centering my primary message
 
 To emphasize my main takeaways, I used annotations. On each graph, I noted what the best place, month, or time of day is to see numbats and gave some background and explanations to help interpret the results.
 
-# Considering accessibility
+## Considering accessibility
 
 I added alt text for each of my visualizations and used annotations to point out the main takeaways in case the color contrasts are not visible. 
 
-## Code
+# Code
 
 View the code for my visualizations by expanding the code chunk below.
 
@@ -301,7 +301,7 @@ ggsave(here("images", "month_waffle.pdf"), plot = waffle, width = 7, height = 3,
 
 ```
 
-## Sources
+# Sources
 
 Numbat (Myrmecobius fasciatus) Recovery Plan. (n.d.).
 
