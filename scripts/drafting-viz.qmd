@@ -19,6 +19,8 @@ library(ozmaps)
 library(dplyr)
 library(janitor)
 library(showtext)
+library(showtext)
+library(waffle)
 
 ```
 
@@ -38,9 +40,6 @@ numbats <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/ti
 
 # Write csv
 write_csv(x = numbats, file = here("data", "numbats.csv"))
-
-
-
 
 ```
 
@@ -123,14 +122,11 @@ knitr::include_graphics(here::here("images", "drawing.jpg"))
 
 ## Make Visualizations
 
-Color Palette 
+Color Palette and fonts
 ```{r}
 brown1 = "#f0d4af" 
 brown2 = "#d9a066" 
 brown3 = "#b8743c"
-# brown1 = "#b6ad90" 
-# brown2 = "#a68a64"
-# brown3 = "#936639"
 brown4 = "#7f4f24"
 brown5 = "#582f0e"
 green1 = "#c2c5aa"
@@ -139,33 +135,22 @@ green3 = "#656d4a"
 green4 = "#414833"
 green5 = "#333d29"
 
-
+# Add fonts
+font_add_google(name = "Sarala", family = "sarala")
+font_add_google(name = "Courier Prime", family = "courier_p")
 
 ```
 
 Map
 ```{r}
-#Plot on a map
-
-showtext_auto(enable = TRUE)
-
-#pdf(here("images", "map2.pdf"), width = 8, height = 6)
 
 # Get map features/join to state dataset
 points_sf <- st_as_sf(numbats, coords = c("decimalLongitude", "decimalLatitude"), 
                       crs = 4326, na.fail = FALSE)
 points_sf <- st_transform(points_sf, st_crs(ozmap_states))
-#points_with_states <- st_join(points_sf, ozmap_states)
 
-# Get number of observatins per state
-#state_counts <- points_with_states |> 
-  #st_drop_geometry() |> 
-  #group_by(NAME, day) |> 
-  #summarise(n_obs = n()) |> 
-  #drop_na()
 
-#ozmap_shaded <- ozmap_states |> 
-  #left_join(state_counts, by = "NAME")
+# Create map
 
 map_numbats <-  ggplot() +
   geom_sf(data = ozmap_states, fill = brown1, color = "grey60", linewidth = 0.5, linetype = 2) + 
@@ -181,43 +166,25 @@ map_numbats <-  ggplot() +
     plot.subtitle = element_text(family = "sarala", size = 10)
   )
 
-#ggsave(here("images", "map.svg"), plot = map_numbats, width = 6, height = 6, dpi = 600, bg = green1)
 
-#print(map_numbats)
+showtext_auto(enable = TRUE)
 
-
-#dev.off()
 pdf(here("map2.pdf"), width = 8, height = 6); print(map_numbats); dev.off()
-
-
 
 showtext_auto(enable = FALSE)
 ```
 
 Time of Day
 ```{r}
-# Clean dataset for this graph - need col for day of the week, hour, 
-# total number of observations that day, 
-# opacity value
-
-# Add fonts
-library(showtext)
-font_add_google(name = "Sarala", family = "sarala")
-font_add_google(name = "Noto Sans", family = "noto-sans")
-font_add_google(name = "IBM Plex Mono", "plexmono")
-font_add_google(name = "Courier Prime", family = "courier_p")
 
 # Add column for total observations per day and opacity value
 numbats_time <- numbats |> 
   group_by(hour,wday) |> 
   summarise(total_daily_obs = n(), .groups = "drop") |> 
-  drop_na() |> 
-  mutate(opacity_val = (total_daily_obs / max(total_daily_obs)))
+  drop_na() #|> 
+  #mutate(opacity_val = (total_daily_obs / max(total_daily_obs)))
 
-# Make it so all hours show up
-
-# Build plot
-
+# Make the day of the week a factor and reorder for labels, remove duplicate days
 numbats_time$wday <- factor(
   numbats_time$wday,
   levels = c("Mon","Tue","Wed","Thu","Fri","Sat","Sun")
@@ -229,23 +196,11 @@ days_df <- numbats_time |>
   distinct(wday_num, wday)
 
 
-
-# Make a column for hours in 12 hour time
-#numbats_time <- numbats_time |> 
-  #mutate(hour_lab = case_when(
-          #hour == 0 ~ "12am",
-          #hour <= 12 ~ paste0(hour, "am"),
-          #hour == 12 ~ "12pm",
-          #TRUE ~ paste0(hour - 12, "pm"))
-        #)
-
 hour_df <- data.frame(
   hour = 0:23,
   label = tolower(format(strptime(0:23, "%H"), "%I%p"))
 ) 
 hour_df$label <- sub("^0", '', hour_df$label)
-
-
 
 
 plot_day <- ggplot(data = numbats_time) +
@@ -278,7 +233,6 @@ plot_day <- ggplot(data = numbats_time) +
   ) 
 
 
-
 showtext_auto(enable = TRUE)
 ggsave(here("images", "time_of_day.pdf"), plot = plot_day, width = 6, height = 6, dpi = 600)
 
@@ -286,7 +240,7 @@ plot_day
 
 showtext_auto(enable = FALSE)
 
-# Rjoin stitching - same number of columns 0 and day of week and NA's for others
+
 
 ```
 
@@ -373,50 +327,20 @@ numbats_year <- numbats |>
   summarize(total_per_year = n()) |> 
   drop_na()
 
-# Add icons: 
-# Example: numbats_year has columns year and total_per_year
-# Add a stacking position for each icon
-#numbats_expanded <- numbats_expanded %>%
-  #group_by(year) %>%
-  #mutate(y_pos = row_number()) %>%
-  #ungroup()
-
-max_icons <- 5
-numbats_year$icons <- round(numbats_year$total_per_year / max(numbats_year$total_per_year) * max_icons)
-
-#numbats_icons <- numbats_year %>%
- # uncount(icons) %>%             # one row per icon
- # group_by(year) %>%
- # mutate(y_pos = row_number()/n) %>%  # spread vertically, scaled to fit stripe
- # ungroup()
-# numbats_icons <- numbats_year %>%
-#   uncount(icons) %>%
-#   mutate(
-#     # jitter x slightly for organic look
-#     x_jitter = as.numeric(factor(year)) + runif(n(), -0.3, 0.3),
-#     # jitter y slightly above the stripe
-#     y_jitter = 1 + runif(n(), 0, 0.3),
-#     img = "numbat_icon.png"
-#   )
-# numbats_icons$img <- here("icons", "numbat_icon.svg")
-
-# library(ggimage)
-# library(rsvg)
 
 biodiversity_plot <- ggplot(numbats_year, aes(x=factor(year), y=1, fill=total_per_year)) +
   geom_tile() +
   scale_fill_gradientn(colors = c(green2, brown3,brown4)) +
   theme_minimal() +
   theme(
-    axis.title = element_blank(),
-    axis.text.y = element_blank(),
-    axis.ticks = element_blank(),
-    panel.grid = element_blank()
-   ) +
+  axis.title = element_blank(),
+  axis.text.y = element_blank(),
+  axis.ticks = element_blank(),
+  panel.grid = element_blank()
+  ) +
   theme_void() +
   theme(legend.position = "none")
-  # geom_image(data=numbats_icons, aes(x=x_jitter, y= y_jitter, image=img), size=0.05,
-  #            inherit.aes = FALSE)
+
 biodiversity_plot
 
 ggsave(here("images", "biodiversity.pdf"), plot = biodiversity_plot, width = 10, height = 6, dpi = 1000)
@@ -439,7 +363,6 @@ numbats_month <- numbats |>
   ungroup() 
 
 # Make waffle chart 
-library(waffle)
 
 numbats_month_waffle <- numbats |> 
   select(month, day) |> 
@@ -472,12 +395,13 @@ waffle <-  ggplot(numbats_month_waffle, aes(fill = month, values = total_obs_mon
   Aug = green2,
   Sep = green2,
   Oct = green2,
-  Nov = brown4,   # highlight month
+  Nov = brown4,  
   Dec = brown3
   ))
+
 waffle
 
-ggsave(here("images", "month_waffle.pdf"), plot = waffle, width = 7, height = 3, units = "in", dpi = 600, bg = green1)
+ggsave(here("images", "month_waffle.pdf"), plot = waffle, width = 7, height = 3, units = "in", dpi = 600)
 
 numbats_month <- numbats_month |> 
    mutate(month = factor(month, levels = month.abb))
